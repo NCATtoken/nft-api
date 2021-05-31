@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+
+from flask import Flask
+from flask import jsonify
+from flask import Response
+import os
+import sys
+import mimetypes
+import requests
+from web3 import Web3
+import json
+
+# process argument variables
+if len(sys.argv) != 2:
+    print("Usage: ./api <path_to_config_file.json>")
+    raise SystemExit()
+
+# init flask
+app = Flask(__name__)
+
+# read config file from argv
+with open(sys.argv[1]) as f:
+  config = json.load(f)
+
+# check node url exists in config
+if config["node_url"] == None:
+    raise SystemExit("node_url field missing from config")
+
+# init web3 provider using node url
+w3 = Web3(Web3.HTTPProvider(config["node_url"]))
+
+# check token abi exists in config
+if config["token_abi"] == None:
+    raise SystemExit("token_abi field missing from config")
+
+# read from abi file
+with open(config["token_abi"]) as f:
+  abi = json.load(f)
+
+# check token address exists in config
+if config["token_address"] == None:
+    raise SystemExit("token_address field missing from config")
+
+# check ipfs hash exists in config
+if config["ipfs_dir_hash"] == None:
+    raise SystemExit("ipfs_dir_hash field missing from config")
+
+# define endpoint
+@app.route('/api/creature/<token_id>')
+def creature(token_id):
+    token_id = int(token_id)
+
+    # fetch ipfs resource based on token id
+    resp = requests.get('https://ipfs.io/ipfs/' + config["ipfs_dir_hash"] + '/' + str(token_id) + '.json')
+
+    # return proper error code to openseas if no data found
+    if resp.status_code != 200:
+        return Response("{'error':'no data found at ipfs location'}", status=204, mimetype='application/json')
+
+    data = resp.json()
+
+    # return json as body of response
+    return(data)
+
+if __name__ == '__main__':
+    app.run(debug=False, use_reloader=True)

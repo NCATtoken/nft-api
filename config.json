@@ -1,0 +1,6 @@
+{
+    "node_url": "https://bsc-dataseed.binance.org",
+    "token_address": "0x3890Ee22F9824086370bbdE2abe680Dc2Af7E156",
+    "token_abi": "./nft.json",
+    "ipfs_dir_hash": "QmYfpLftJytwGyeisa9SXpG4pVHezekfM8kuHX9FNCgEmx"
+}
