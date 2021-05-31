@@ -15,4 +15,4 @@ RUN pip install eth-utils==1.10.0
 RUN pip install web3==5.17.0
 
 EXPOSE 5000
-CMD ./api /config.json 
+CMD ["./api", "/config.json"]
